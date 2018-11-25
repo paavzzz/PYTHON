@@ -3,13 +3,15 @@
 methylate the original strand (adding methyl markers in place of adenosines), create a complimentary DNA,
 and overall check that hemimethylation is successful.
 
+# Assumption: sequence in input file is written in 5' to 3' direction. 
+
 import numpy as np
 
 def methylate(filepath,output):
   DNA = open(filepath, 'r')
   f = open(output, 'w')
   DNA= DNA.read()
-  f.write(DNA.replace('A','m'));
+  f.write(DNA.replace('GATC','GmTC'));
 
 def complimentary(filepath,output):
   DNA = open(filepath, 'r')
@@ -37,7 +39,7 @@ def hemimethylate(filepath):
 
   c=np.array(np.where(c=='T'))
   m=np.array(np.where(m=='m'))
-  check1=(c==m)
+  check1=m.issubset(c)
 
   check=np.array(np.where(c=='m'))
 
