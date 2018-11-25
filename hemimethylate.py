@@ -1,7 +1,8 @@
 
+
 #These set of functions mimic biochemical process that is a prerequisite for DNA repair machinery. They 
-methylate the original strand (adding methyl markers in place of adenosines), create a complimentary DNA,
-and overall check that hemimethylation is successful.
+#methylate the original strand (adding methyl markers in place of adenosines), create a complimentary DNA,
+#and overall check that hemimethylation is successful.
 
 # Assumption: sequence in input file is written in 5' to 3' direction. 
 
@@ -39,14 +40,11 @@ def hemimethylate(filepath):
 
   c=np.array(np.where(c=='T'))
   m=np.array(np.where(m=='m'))
-  check1=m.issubset(c)
-
-  check=np.array(np.where(c=='m'))
+  #checks that m is a subset of c
+  check1=np.isin(m,c)
 
   if check1.all:
-    if not all(check):
-      
-      print("The DNA strand has been replicated and properly hemimethylated. Can be used to check MutH and MutL-MutS activity.\n")
+    print("The DNA strand has been replicated and properly hemimethylated. Can be used to check MutH and MutL-MutS activity.\n")
 
 hemimethylate("./sequence.txt")
 
