@@ -1,0 +1,26 @@
+# There is 1 pair of bunnies in the 1st month.
+# Offspring are born starting the 3rd month. The number of baby bunnies born per pair is the number of bunnies in the population 2 months
+ ago, times the birth number n.
+# So after 34 months, with 5 bunnies being born per pair, we end up with a population of 313507166394911!
+
+def bunnies(m, b):
+  if m < 0 : #Month counter cannot be less than 1
+    raise ValueError('Months start at 1.')
+  if m == 1 or m == 2: # No offspring in the 2nd month because of the condition that offspring can only be given based on the number 2 months
+  #prior
+    return 1
+  else:
+    return bunnies(m-1,b) + b*bunnies(m-2,b) 
+
+  
+def fibpop(filepath):
+  seq = open(filepath,'r') 
+  seq = seq.read()
+  seq = list(map(str, seq.split(' ')))
+  
+  months, b = map(int,seq)
+  return(bunnies(months,b))
+
+population = fibpop('./google.txt')
+print(population)
+
