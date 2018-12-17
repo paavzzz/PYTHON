@@ -1,0 +1,21 @@
+#Goes through a passed in sequence and returns positions (1-based indexing) of a given consensus sequences. For example, a file with
+# ACTGAATGGGAAATCTTATAATAGATGATGATGATGGGGATGATGATATAAT 
+# TATAAT
+# read in this function will return the positions where the TATAAAT consensus sequence is located.
+
+def motifs(filepath):
+  seq = open(filepath,'r')
+  seq = seq.read().split('\n') #Splits according to newline character
+
+  indexes = []
+  i = seq[0].find(seq[1]) #Substring is located in 2nd position
+
+  while i>0:
+    indexes.append(i+1) 
+    i = seq[0].find(seq[1],i+1) #increment start position one at a time to be able to account for overlapping occurrences in reading frames
+
+  return(' '.join(map(str,indexes)))
+
+v = motifs('./google.txt')
+print(v)
+
