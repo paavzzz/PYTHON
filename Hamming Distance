@@ -1,0 +1,16 @@
+def Hamming(filepath):
+  seq = open(filepath,'r')
+  seq = seq.read()
+  seq = list(map(str, seq.split('\n'))) #split according to new line character, and make sure inputs are all strings
+  
+  combined = zip (seq[0], seq[1]); #combine them into a unified structure
+  count = 0
+  
+  for a,b in combined:
+    if a!=b: #if the strings differ at that character
+      count+=1
+
+  return count
+  
+a=Hamming('./google.txt')
+print(a)
