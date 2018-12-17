@@ -1,0 +1,21 @@
+def MendelGen(filepath):
+  seq = open(filepath,'r')
+  seq = seq.read()
+  seq = list(map(str, seq.split(' '))) #split input by spaces 
+  
+  k, m, n = map(int,seq) #deconstruct list to variables for ease of reading
+  total = k + m + n
+  p = 0.5 # AA x Aa
+  q = 0.75 # Aa x Aa
+  
+  A = ( k/total * (k-1)/(total-1) ) + ( k/total * m/(total-1) *2 ) + ( k/total * n/(total-1) * 2 )
+
+  B = m/total * n/(total-1) * 2 * p
+
+  C = m/total * (m-1)/(total-1) * q
+
+  return('%.5f'%(A + B + C)) #truncate to 5 decimal places
+
+  
+prob = MendelGen('./google.txt')
+print(prob)
