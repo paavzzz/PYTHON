@@ -1,0 +1,26 @@
+
+#If a premature stop codon encountered, returns the resulting possible protein fragments so the termination areas can be easily visualized.
+
+import re #super useful for multiple delimiters in a string
+from textwrap import wrap #so neat and easy to use to cut up a string into substrings of a certain size!
+
+
+def codontable(filepath): #takes in a codon table and returns a list of codons and their respective single letter amino acid codes
+  t = open(filepath,'r')
+  t = t.read()
+  t = re.split(' |\n',t) #splits by both spaces and new lines
+  t = list(filter(lambda i: i != '', t)) #removes all empty values
+  return t
+
+def aaseq(filepath):
+  c = codontable('./google.txt')
+  seq = open(filepath,'r')
+  seq = seq.read()
+  c = dict(zip(c[::2], c[1::2])) #convers list into a dictionary by using slicing. [::2] takes every even element, while [1::2] takes every odd
+  
+  return('\n'.join(re.split('Stop',''.join([c[i] for i in wrap(seq,3)])))) #looks up values for the 3 letter codons, and strings it together.
+  #If Stop codon is encountered, string is split up.
+ 
+prot = aaseq('./compliment.txt')
+print(prot)
+
