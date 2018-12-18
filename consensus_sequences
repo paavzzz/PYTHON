@@ -1,0 +1,62 @@
+#This reads from a FASTA file with a known number of characters for the label of each sequence, and writes to a file the consensus sequence
+#based on the highest frequency occurrence of the nucleotide occurring at every position.
+#Example:
+
+#TAATAAAA
+#TATAAAGC
+#TAATAAAA
+
+
+#The consensus sequence is below, and the degree of conservation can be seen by the 2-dimensional array.
+#TAATAAAA
+#A: 0 3 2 3 3 2 2 
+#C: 0 0 0 0 0 0 1 
+#G: 0 0 0 0 0 1 0 
+#T: 3 0 1 0 0 0 0 
+
+
+import numpy as np
+import pandas as pd
+def consensus(filepath):
+  
+  f = open(filepath, 'r')
+  seq = f.read().split('>')
+
+ 
+  del(seq[0]) #There always is an empty space at the start of the list for some reason.
+
+  #List of just sequences! Cleaning it up and removing the Labels and \n characters.
+  for i in range(len(seq)):
+    seq[i]=seq[i].replace(seq[i][0:13],'')
+    seq[i]=seq[i].replace('\n','')
+  
+  panda = pd.DataFrame(np.array(list(map(list, seq)))) #Creates a numpy array so that a Pandas dataframe can be made for ease in counting
+  #frequencies across the columns
+
+  listA=[]
+  listC=[]
+  listT=[]
+  listG=[]
+
+  #Counts across the columns
+  for column in panda.columns:
+    listA.append((panda[column]=="A").sum())
+    listC.append((panda[column]=="C").sum())
+    listT.append((panda[column]=="T").sum())
+    listG.append((panda[column]=="G").sum())
+
+  panda2=pd.DataFrame([listA,listC,listT,listG])
+  
+  string='ACTG'
+  final=[]
+  for columns in panda2.columns:
+    final.append(string[panda2[columns].idxmax()]) #Finds the row index of the maximum value across each column. 
+  panda2.index=['A:','C:','T:','G:']
+  final = ''.join(final)
+  
+  w = open("consensusseq.txt","w")
+  w.write(final+"\n")
+  w.write(panda2.to_string(header=False))
+  
+
+consensus('./sequence.txt')
