@@ -1,0 +1,44 @@
+#Memory Limit seems to be 32 months with 17 month lifespan
+
+import numpy as np
+from collections import Counter
+
+def fibpop(filepath):
+  seq = open(filepath,'r') 
+  months, b = map(int,str(seq.read()).split(' '))
+  track=[1,1]
+
+  print(b)
+  j = 0
+  l = np.array(list(range(1,b+2)))
+ 
+
+  if months>2:
+    bunnies=np.array([1])
+    count=0
+
+    for i in range(months-2):
+      bunnies=(bunnies+1)
+
+      a=Counter(bunnies)
+      for i in range(3,b+2):
+        j+=a[i]
+    
+      bunnies=bunnies.tolist()
+      bunnies+=[1]*j
+      j=0
+      
+      #print(bunnies)
+      bunnies=np.array(bunnies)
+      bunnies=bunnies[bunnies<=b]
+
+    a=Counter(bunnies)
+    for i in range(1,b+2):
+      count+=a[i]
+    
+      
+    return(count)
+
+      
+a=fibpop('./google.txt')
+print(a)
