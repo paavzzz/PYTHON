@@ -1,0 +1,34 @@
+#This file is useful for searching and listing out locations of a particular protein motif of interest. This specific file looks for N{P}[ST]{P} 
+motif in passed in ACCESS ids. The protein sequences are found at UniProt database.
+
+import urllib.request
+import re
+
+def protein_motif(uniprot_id):
+  #Changing byte array to string, and removing the 1st descriptive line found in website. Modifying so protein sequence is a string with no spaces and other characters '\n' etc.
+  web_address='https://www.uniprot.org/uniprot/'+uniprot_id+'.fasta'
+  data = urllib.request.urlopen(web_address)
+  seq=''.join(''.join([line for line in data.read().decode("utf-8")]).split('\n')[1:])
+
+  #N-glycosylation motif starts off with N.
+  indexes=[i.start() for i in re.finditer('N',seq)]
+
+  locations=[]
+  for i in indexes:
+    #check to make sure index not out of bounds, N{P}[ST]{P} is what we are looking for.
+    if((i+3)<len(seq)-1 and seq[i+1]!='P' and seq[i+3]!='P' and seq[i+2] in 'ST'):
+      locations.append(i+1) #i+1 because location is not zero-based indexing. 
+  return locations
+
+#the file we are reading from contains id's. Example: A3DF24
+#P11171_41_HUMAN
+#Q3Z2Z2
+
+f=[lines.strip('\n') for lines in open('./sequence.txt').readlines()]
+for i in f:
+  a=protein_motif(i)
+  if len(a)>0:
+    print(i) #print id
+    print(' '.join(list(map(str,a)))) #print the locations where the N-glycol motif can be found.
+
+
