@@ -1,0 +1,47 @@
+#This reads a FASTA file and reports the DNA sequences that overlap at edges by exactly 3 nucleotides.
+
+#For example,
+#>FASTA_101
+#ACTGACTG
+#>FASTA_102
+#CTGAAAAA
+#>FASTA_103
+#AAATGTGT
+
+
+
+#will write to a new file names 'graphtheory.txt'...
+
+#FASTA_101 FASTA_102
+#FASTA_102 FASTA_103
+
+from itertools import groupby
+
+def fasta(filepath):
+  f = open(filepath, 'r')
+  lines = []
+  for a, b in groupby(f,lambda x: x[0]=='>'): #f stores both booleans and groupby objects. in this case, filtering to group by >FASTA label
+    lines.append(''.join(list(b)).strip('\n')[0::]) #a are the booleans. don't need that! converting b, all the actual objects, into a list of stringd
+  headers=lines[0::2] #every other string is a FASTA label
+  for i in range(len(headers)):
+    headers[i]=headers[i][1::]
+  sequences=lines[1::2] #the dna sequences
+  for i in range(len(sequences)):
+    sequences[i]=sequences[i].replace('\n','') #removing '\n'
+  f.close()
+  return(headers,sequences)
+
+def checkedge(filepath):
+  final=[]
+  f = open('graphtheory.txt', 'w')
+  [labels,seq]=fasta(filepath)
+  for i in range(len(seq)):
+    for j in range(1,len(seq)):
+      if seq[i].endswith(seq[j][0:3]) and i!=j and str(labels[i])+' '+str(labels[j])+'\n' not in final:
+        f.write(str(labels[i])+' '+str(labels[j])+'\n')
+        final.append(str(labels[i])+' '+str(labels[j])+'\n')
+  
+  del(final)
+  f.close()
+
+checkedge('./sequence.txt')
