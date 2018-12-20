@@ -1,0 +1,55 @@
+#This reads from a FASTA formatted input file, and returns the longest DNA sequence found across all of the sequences passed in.
+#For example...
+#>FASTA_1
+#ACGTACGT
+#>FASTA_2
+#TACGTACCA
+#>FASTA_3
+#AACGTATA
+#will print out ACGTA !
+
+from itertools import groupby
+import time
+
+#Processing of FASTA file
+def fasta(filepath):
+  f = open(filepath, 'r')
+  lines = []
+  for a, b in groupby(f,lambda x: x[0]=='>'):
+    lines.append(''.join(list(b)).strip('\n')[0::])
+  headers=lines[0::2]
+  for i in range(len(headers)):
+    headers[i]=headers[i][1::]
+  sequences=lines[1::2]
+  for i in range(len(sequences)):
+    sequences[i]=sequences[i].replace('\n','')
+  f.close()
+  return(headers,sequences)
+
+def longestmotif(filepath):
+  [labels,seq]=fasta(filepath)
+  
+  substrings=[]
+  i=1
+  j=1
+  shortest=min(seq,key=len) #Since sequences can be varying lengths, finding the shortest one to use as the longest possible motif.
+  substrings = set()
+  for i in range(len(shortest)):
+    while(j<=len(shortest)): #Generating all possible substrings of a given string and saving it in a set collection. This is because set ensures NO DUPLICATES are added!
+      substrings.add(shortest[i:j])
+      j = j +1
+    j=1
+
+  substrings=list(substrings)
+  substrings.sort(key=len) #Sorting by size of substrings
+  
+  i = len(substrings)-1
+  while(all(substrings[i] in s for s in seq)==False and i>-1): #Start at end of sorted list, and then keep checking until a match is found across all of the sequences.
+    i-=1
+  
+  print(substrings[i])
+
+start = time.time()
+longestmotif('./sequence.txt')
+end = time.time()
+print(end-start) 
