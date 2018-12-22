@@ -4,23 +4,44 @@
 import re #super useful for multiple delimiters in a string
 from textwrap import wrap #so neat and easy to use to cut up a string into substrings of a certain size!
 
+#UUU F      CUU L      AUU I      GUU V
+#UUC F      CUC L      AUC I      GUC V
+#UUA L      CUA L      AUA I      GUA V
+#UUG L      CUG L      AUG M      GUG V
+#UCU S      CCU P      ACU T      GCU A
+#UCC S      CCC P      ACC T      GCC A
+#UCA S      CCA P      ACA T      GCA A
+#UCG S      CCG P      ACG T      GCG A
+#UAU Y      CAU H      AAU N      GAU D
+#UAC Y      CAC H      AAC N      GAC D
+#UAA Stop   CAA Q      AAA K      GAA E
+#UAG Stop   CAG Q      AAG K      GAG E
+#UGU C      CGU R      AGU S      GGU G
+#UGC C      CGC R      AGC S      GGC G
+#UGA Stop   CGA R      AGA R      GGA G
+#UGG W      CGG R      AGG R      GGG G 
+
+
+import re
+from textwrap import wrap
 
 def codontable(filepath): #takes in a codon table and returns a list of codons and their respective single letter amino acid codes
   t = open(filepath,'r')
   t = t.read()
   t = re.split(' |\n',t) #splits by both spaces and new lines
-  t = list(filter(lambda i: i != '', t)) #removes all empty values
-  return t
+  t = list(filter(lambda i: i != '', t)) 
+  c = dict(zip(t[::2], t[1::2]))#removes all empty values
+  return c
 
 def aaseq(filepath):
-  c = codontable('./google.txt')
+  c = codontable('google.txt')
   seq = open(filepath,'r')
   seq = seq.read()
-  c = dict(zip(c[::2], c[1::2])) #convers list into a dictionary by using slicing. [::2] takes every even element, while [1::2] takes every odd
-  
-  return('\n'.join(re.split('Stop',''.join([c[i] for i in wrap(seq,3)])))) #looks up values for the 3 letter codons, and strings it together.
+  #c = dict(zip(c[::2], c[1::2])) #convers list into a dictionary by using slicing. [::2] takes every even element, while [1::2] takes every odd
+  return('\n'.join(re.split('Stop',''.join(c[i] for i in wrap(seq,3))))) #looks up values for the 3 letter codons, and strings it together.
   #If Stop codon is encountered, string is split up.
  
 prot = aaseq('./compliment.txt')
 print(prot)
+
 
