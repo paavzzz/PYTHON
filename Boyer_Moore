@@ -1,0 +1,74 @@
+#Boyer_Moore algorithm, well-known universally. Uses both bad character rule and good suffix rule.
+#Code source: Bioinformatic Algorithms - Design and Implementation in Python, Miguel Rocha and Pedro G. Ferreira
+
+#Code modified with comments and minor changes as I worked on understanding the theory of how exactly this searching algorithm works. 
+
+#Overall complexity will be O(length of text/length of pattern). Best case scenario requires that many alignments.
+class Boyer_Moore:
+  def __init__(self,alphabet,pattern):
+    self.alphabet = alphabet
+    self.pattern= pattern
+    self.preprocess()
+
+  def preprocess(self):
+    self.bad_char_pre()
+    self.good_suffix_pre()
+
+#if n is # of characters in pattern, and alpha is the set of characters in self.alphabet, the time complexity is O(n+alpha)
+  def bad_char_pre(self):
+    self.table1 = {}
+
+    for c in self.alphabet:
+      self.table1[c] = -1 #placeholder of -1
+
+    for j in range(len(self.pattern)):
+      self.table1[self.pattern[j]] = j #stores rightmost position in pattern
+
+#if n is the # of characters in pattern, this time complexity will be O(n)
+  def good_suffix_pre(self):
+    i = len(self.pattern)
+    j = len(self.pattern)+1
+    self.border = [0] * j
+    self.table2 = [0] * j
+    self.border[i] = j 
+
+    #Case 1: Matching suffix occurs somewhere in pattern
+    while i>0:
+      while j<= len(self.pattern) and self.pattern[i-1] != self.pattern[j-1]:
+        if self.table2[j] == 0:
+           self.table2[j] = j-i;
+
+        j = self.border[j]
+      i -= 1
+      j -= 1
+      self.border[i] = j
+
+    #Case 2: Only part of matching suffix occurs at prefix
+    j = self.border[0]
+    for i in range(len(self.pattern)):
+      if self.table2[i] == 0: 
+        self.table2[i] = j
+      if i == j: 
+        j = self.border[j] 
+  
+  def search_pattern(self , seq):
+    locations = []
+    i=0
+    while i <= len(seq) - len(self.pattern):
+      j= len (self.pattern) - 1
+
+      while j>=0 and self.pattern[j]==seq[i+j]:
+        j -= 1
+
+      #Entire pattern found! shift by good suffix rule
+      if (j<0):
+        locations.append(i)
+        i += self.table2[0]
+
+      #Mismatch found.
+      #Shift by max of bad character rule, or good suffix rule
+      else :
+        c = seq[j+i]
+        i += max(self.table2[j+1], j-self.table1[c])
+    return locations
+ 
