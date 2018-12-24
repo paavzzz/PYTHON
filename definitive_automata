@@ -1,0 +1,70 @@
+#DFA to find a particular pattern in a sequence
+#Code adapted and referenced from, with minor changes, from Bioinformatic Algorithms written by Miguel Rocha and Pedro Ferreira
+
+def overlap(text, pattern):
+  max_index = min(len(text),len(pattern))
+  for i in range(max_index,0, -1):
+    if pattern[:i] == text[-i:]:
+      return i
+  return 0
+
+class Det_Automata:
+ 
+
+  def __init__( self, alphabet, pattern):
+    self.totalstates = len(pattern) + 1 # number of states possible needs to account for initial state as well, so if pattern is 'ACA' will have Q0 QA QC QA.
+    self.alphabet = alphabet
+    self.states = {} #dictionary
+    self.transition_table(pattern)
+  
+#0,A -> 1
+#0,C -> 0
+#1,AA -> 1
+#1,AC -> 2
+#2,ACA -> 3
+#2,ACC -> 2
+#3,ACAA -> 1
+#3,ACAC -> 2
+
+#ACTGACGAC
+#GAC
+#[:3]==[:-3] no
+#[2:]==[-2:] yes
+#[:0]==[0:] 
+#[:-1]==[1:]
+  
+
+  def transition_table(self, pattern):
+    for i in range(self.totalstates):
+      for c in self.alphabet:
+        string = pattern[0:i] + c
+        self.states[(i,c)]= overlap(string,pattern) 
+
+  def next_state(self,i,character):
+    return self.states.get((i,character)) #.get() to ensure that no error pops up if key does not exist
+  def print_all(self):
+    print ("States: " , self.totalstates)
+    print ("Alphabet: " , self.alphabet)
+    print ("Transition table:")
+    for i in self.states.keys():
+      print (i[0], " ", i[1], " −> ", self .states[i])
+
+  def traverse_states(self,text):
+    i = 0
+    travel=[0]
+    for c in text:
+      i = self.next_state(i,c)
+      travel.append(i)
+    return travel
+
+  def pattern_find(self, text):
+    i=0
+    locations = []
+    for i in range(len(text)):
+      state = self.next_state(i,text[i])
+      if i == self.totalstates - 1:
+        locations.append(i - self.totalstates+2)#gets index of the starting point where pattern occurs in the text
+        #Example: ACTGACTGC, searching for TGA
+        #once we have reached A in TGA, i = 4
+        #4 - 4 + 2 = 2. 2 is where T is located.
+    return locations
