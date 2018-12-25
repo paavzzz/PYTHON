@@ -1,0 +1,49 @@
+import re
+
+def valid_dna_sequence(sequence):
+  if re.search('[^ACTGactg]')!=None:
+    return False
+  else:
+    return True
+    
+def find_largest_valid_protseq(aaseq):
+  a=re.iter('M[^_]*_',aaseq)
+  protein=''
+  max=0
+  for i in a:
+    check = i.span()[1] - i.span()[0]
+    if check>max:
+      max = check
+      protein=i.group()
+  return protein
+
+# seq = 'ACTGAAAATCAAAT'
+# pattern='AAA'
+# So find_all_occurences will return desired outcome of [4, 5, 10].
+
+def find_pattern_index(sequence, pattern):
+
+  #processing = re.compile(pattern)
+  #result = processing.search(sequence)
+  
+  result = r.search(pattern, sequence)
+  if result!=None:
+    return result.span()[0] # result.span() returns (x,y) and result.group() will return sequence
+  else:
+    print('Pattern not found. Returning -1 as index.')
+    return -1
+
+def find_all_occurences(sequence,pattern):
+  pattern = '(?='+pattern+') # '(?=...)' is what allows for overlapping patterns to be counted. The lookahead assertion does not consume 
+  #the characters of the string. Comment this out if overlapping patterns are not to be considered.
+  
+  #processing = re.compile(pattern)
+  #result = processing.finditer(sequence)
+  
+  result = re.finditer(pattern,sequence)
+  indices=[i.span()[0] for i in result]
+  return indices #if no pattern found, will return an empty list.
+  
+
+ 
+    
