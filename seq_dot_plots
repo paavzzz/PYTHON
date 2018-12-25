@@ -1,0 +1,54 @@
+def create_matrix(rows, cols):
+  return [[0]*cols for i in range(rows)]
+
+def dot_plot(seq1,seq2):
+  matrix = create_matrix(len(seq1),len(seq2))
+  for i in range(len(seq1)):
+    for j in range(len(seq2)):
+      if seq1[i]==seq2[j]:
+        matrix[i][j]=1
+  return matrix
+
+def print_matrix(matrix):
+  for i in matrix:
+    print(str(i) + '\n')
+
+def print_dotplot(mat, s1, s2):
+  print(' '.join(" " + s2 + '\n'))
+  for i in range(len(mat)):
+    print(s1[i],end=' ')
+    for j in range(len(mat[i])):
+      if mat[i][j] == 1:
+        print("* ",end='')
+      else:
+        print("x ",end='')
+    print("\n")
+
+def stringent_dotplot(seq1, seq2, stringency, window):
+  matrix = create_matrix(len(seq1),len(seq2))
+  matches = 0
+  tracker = 0
+  indices=[[0,0]]
+  for i in range(len(seq1)):
+    for j in range(len(seq2)):
+      if seq1[i]==seq2[j]:
+        matches+=1
+        indices.append([i,j])
+      tracker+=1
+      if tracker%window==0:
+        if matches>=stringency:
+          indices = indices[1:]
+          for c in indices:
+            matrix[c[0]][c[1]]=1
+        matches = 0
+        indices=[[0,0]]
+          
+  return matrix
+
+
+
+a=dot_plot('ACTG','GCAG')
+print_matrix(a)
+print_dotplot(a,'ACTG','GCAG')
+b = stringent_dotplot('ACTGGGATCCA','GATGGCAACGA',2,5)
+print_dotplot(b,'ACTGGGATCCA','GATGGCAACGA')
