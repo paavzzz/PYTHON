@@ -7,7 +7,7 @@ def valid_dna_sequence(sequence):
     return True
     
 def find_largest_valid_protseq(aaseq):
-  a=re.iter('M[^_]*_',aaseq)
+  a=re.finditer('M[^_]*_',aaseq)
   protein=''
   max=0
   for i in a:
