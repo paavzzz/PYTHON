@@ -1,0 +1,109 @@
+This file implements Smith-Waterman algorithm for pairwise alignment. The substitution matrix must be a dictionary type with the keys
+#as pairs of amino acids, or nucleotides.
+#This file is derived from Miguel Rocha and Pedro G. Ferreira's Bioinformatic Algorithms : Design and Implementation in Python book.
+#Modified it with my comments and a few minor changes, for my own use and better understanding of this algorithm! 
+###############################################
+#1 is diagonal
+#2 is vertical
+#3 is horizontal
+def max3t (v1, v2, v3):
+    if v1 > v2 and v1 > v3: #diagonal
+      return 1
+    if v3 > v2 and v3 > v2: #horizontal
+      return 3
+    else:
+      return 2 #vertical
+def scoring (c1, c2, substitution_matrix, gap_penalty):
+    if c1 == "-" or c2=="-":
+        return int(gap_penalty)
+    else:
+        return int(substitution_matrix[c1+c2]) #dictionary lookup key, which is the amino acid pair . Example: 'WS'
+
+def smith_waterman (seq1, seq2, substitution_matrix, gap_penalty):
+    matrix = [[0]]
+    traceback = [[0]]
+    row = 0
+    col = 0
+    highest_score = 0
+    #Sequence 2 used to label rows
+    for j in range(1, len(seq2)+1):
+        matrix[0].append(0) #Cannot be negative, so gap rows and columns are filled in with 0's
+        traceback[0].append(0)
+    #Sequence 1 used to label columns
+    for i in range(1, len(seq1)+1):
+        matrix.append([0]) 
+        traceback.append([0])
+    #Filling in the rest with non-negative values
+    for i in range(0, len(seq1)):
+        for j in range(len(seq2)):
+            s1 = matrix[i][j] + scoring (seq1[i], seq2[j], substitution_matrix, gap_penalty) #diagonal
+            s2 = matrix[i][j+1] + gap_penalty #horizontal
+            s3 = matrix[i+1][j] + gap_penalty #vertical
+            b = max(s1, s2, s3,0)
+            #if negative value, reset!!!
+            matrix[i+1].append(b)
+            if b!=0:
+              traceback[i+1].append(max3t(s1,s2,s3))
+            if b==0:
+              traceback[i+1].append(0)
+            
+            if b > highest_score: 
+              highest_score = b
+              col = i+1
+              row = j+1
+    return (matrix, traceback, highest_score, row, col)
+
+def print_mat (mat):
+    for i in range(0, len(mat)): #traverses across rows
+        print(mat[i]) #prints each list
+
+def recover_align (matrix, traceback, seq1, seq2,row,col):
+  sequence = ["",""]
+  #i,j = max_of_matrix(matrix)
+  i=row
+  j=col
+  while(traceback[i][j]>0):
+    if traceback[i][j]==1: #diagonal
+      sequence[0] = seq1[i-1] + sequence[0]
+      sequence[1] = seq2[j-1] + sequence[1]
+      i-=1
+      j-=1
+    #Sequence 2 was used to label rows
+    elif traceback[i][j] == 3: #horizontal
+      sequence[0] = '-' + sequence[0]
+      sequence[1] = seq2[j-1] + sequence[1]
+      j-=1
+    #Sequence 1 was used to label columns
+    elif traceback[i][j] == 2: 
+      sequence[0] = seq1[i-1] + sequence[0]
+      sequence[1] = '-' + sequence[1]
+      i-=1
+  return sequence
+
+def max_of_matrix(matrix):
+  highest_score = matrix[0][0]
+  row = 0
+  col = 0
+  for i in range(0, len(matrix)):
+    for j in range(0, len(matrix[i])):
+      if matrix[i][j] > highest_score:
+        highest_score = matrix[i][j]
+        row = i
+        col = j
+  return (row, col)
+seq1 = "PHSWG"
+seq2 = "HGWAG"
+(matrix,traceback,score, row, col)=smith_waterman(seq1,seq2,dictionary,-4)
+
+print("Score matrix for Smith-Waterman...")
+print_mat(matrix)
+print("\n")
+print("Traceback matrix for Smith-Waterman...")
+print_mat(traceback)
+
+print("Score of optimal alignment:", matrix[len(seq1)][len(seq2)],"\n") #optimal alignment score will be found in bottom right corner. 
+
+print("Printing alignment...")
+alig = recover_align(matrix,traceback, seq1, seq2,row,col)
+print(alig[0])
+print(alig[1])
