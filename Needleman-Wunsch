@@ -1,0 +1,98 @@
+This file implements Needleman-Wunsch algorithm for pairwise alignment. The substitution matrix must be a dictionary type with the keys
+#as pairs of amino acids, or nucleotides.
+#This file is derived from Miguel Rocha and Pedro G. Ferreira's Bioinformatic Algorithms : Design and Implementation in Python book.
+#Modified it with my comments and a few minor changes, for my own use and better understanding of this algorithm! 
+###############################################
+#1 is diagonal
+#2 is vertical
+#3 is horizontal
+
+#Filling in top row and leftmost column (in case of gap)
+#Example:
+
+# _   gap M  P  S   T   V
+# gap  0 -4 -8 -12 -16 -20
+# S   -4
+# M   -8
+# Q   -12
+# S   -16
+# S   -20
+  
+def needleman_Wunsch (seq1, seq2, substitution_matrix, gap_penalty):
+    matrix = [[0]]
+    traceback = [[0]]
+
+    #sequence2 forms row labels
+    for j in range(1, len(seq2)+1): 
+        matrix[0].append(gap_penalty * j) #gap row
+        traceback[0].append(3) #horizontal
+
+    #sequence 1 forms column labels
+    for i in range(1, len(seq1)+1):
+        matrix.append([gap_penalty * i])
+        traceback.append([2]) #vertical
+    
+    #filling in the rest of the matrix
+    for i in range(0, len(seq1)):
+        for j in range(len(seq2)):
+            option1 = matrix[i][j] + score_pos (seq1[i], seq2[j], substitution_matrix, gap_penalty); #diagonal
+            option2 = matrix[i][j+1] + gap_penalty #horizontal
+            option3 = matrix[i+1][j] + gap_penalty #vertical
+            matrix[i+1].append(max(option1, option2, option3))
+            traceback[i+1].append(max3t(option1, option2, option3))
+    return (matrix, traceback)
+
+def max3t (v1, v2, v3):
+    if v1 > v2 and v1 > v3: #diagonal
+      return 1
+    if v3 > v2 and v3 > v2: #horizontal
+      return 3
+    else:
+      return 2 #vertical
+
+def score_pos (c1, c2, substitution_matrix, gap_penalty):
+    if c1 == "-" or c2=="-":
+        return int(gap_penalty)
+    else:
+        return int(substitution_matrix[c1+c2]) #dictionary lookup key, which is the amino acid pair . Example: 'WS'
+
+def recover_align (traceback, seq1, seq2):
+    sequence = ["", ""]
+    i = len(seq1)
+    j = len(seq2)
+    while i>0 or j>0:
+        if traceback[i][j]==1: #diagonal
+            sequence[0] = seq1[i-1] + sequence[0] #reverse
+            sequence[1] = seq2[j-1] + sequence[1] #reverse
+            i -= 1
+            j -= 1
+        elif traceback[i][j] == 3: #horizontal
+            sequence[0] = "-" + sequence[0]
+            sequence[1] = seq2[j-1] + sequence[1] #sequence 2 forms row labels
+            j -= 1
+        else: #vertical
+            sequence[0] = seq1[i-1] + sequence[0] #sequence 1 forms column labels
+            sequence[1] = "-" + sequence[1] 
+            i -= 1
+    return sequence
+
+def print_mat (mat):
+    for i in range(0, len(mat)): #traverses across rows
+        print(mat[i]) #prints each list
+
+seq1 = "PHSWG"
+seq2 = "HGWAG"
+(matrix,traceback)=needleman_Wunsch(seq1,seq2,dictionary,-4)
+
+print("Score matrix for Needleman-Wunsch...")
+print_mat(matrix)
+print("\n")
+print("Traceback matrix for Needleman-Wunsch...")
+print_mat(traceback)
+
+print("Score of optimal alignment:", matrix[len(seq1)][len(seq2)],"\n") #optimal alignment score will be found in bottom right corner. 
+
+print("Printing alignment...")
+alig = recover_align(traceback, seq1, seq2)
+print(alig[0])
+print(alig[1])
