@@ -1,7 +1,6 @@
 # Implementing a Trie to Store a Series of Small Nucleotide Sequences/Fragments
 #    ---for easy probing of large target sequence----
 
-
 # Pavithra
 # May 13, 2019
 # With credit to Miguel Rocha, Pedro G. Ferreira - Bioinformatics Algorithms: Design and Implementation in Python - Ch. 16.2
